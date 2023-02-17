@@ -20,6 +20,14 @@
 \titlespacing\subsection{0pt}{8pt plus 4pt minus 2pt}{0pt plus 2pt minus 2pt}
 \titlespacing\subsubsection{0pt}{8pt plus 4pt minus 2pt}{0pt plus 2pt minus 2pt}
 
+% 在part页添加内容
+\makeatletter
+\let\old@endpart\@endpart
+\renewcommand\@endpart[1][]{%
+    \begin{quote}#1\end{quote}%
+    \old@endpart}
+\makeatother
+
 \setminted[python]{bgcolor=red!5, xleftmargin=20pt, linenos, breakanywhere=true,fontsize=\small,baselinestretch=1.1}
 %定义新的minted命令
 \newminted[pyc]{python}{}
