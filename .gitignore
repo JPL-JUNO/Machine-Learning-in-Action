@@ -2,6 +2,7 @@ Notes/main.aux
 .log
 .out
 .toc
+Notes/.aux
 Notes/main.log
 Notes/main.out
 Notes/main.synctex.gz
@@ -9,3 +10,6 @@ Notes/main.toc
 _minted-main
 Notes/ch01.aux
 Notes/temp.tex
+.aux
+Notes/ch02.aux
+__pycache__
