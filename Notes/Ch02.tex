@@ -30,9 +30,9 @@ k-近邻算法（kNN），它的工作原理是：存在一个样本数据集合
 \end{algorithm}
 
 \begin{tcolorbox}[title=代码清单]
-    \href{}{kNN.py}
+    \href{https://github.com/JPL-JUNO/Machine-Learning-in-Action/blob/main/Codes/kNN.py}{kNN.py}
 
-    \href{}{kNN.ipynb}
+    \href{https://github.com/JPL-JUNO/Machine-Learning-in-Action/blob/main/Codes/kNN.ipynb}{kNN.ipynb}
 \end{tcolorbox}
 
 classify0()函数有4个输入参数：用于分类的输入向量是inX，输入的训练样本集为dataSet，标签向量为labels，最后的参数k表示用于选择最近邻居的数目，其中标签向量的元素数目和矩阵dataSet的行数相同。
@@ -55,9 +55,9 @@ classify0()函数有4个输入参数：用于分类的输入向量是inX，输�
     \item 每周消费的冰淇淋公升数
 \end{itemize}
 
-在将上述特征数据输入到分类器之前，必须将待处理数据的格式改变为分类器可以接受的格式。在kNN.py中创建名为file2matrix的函数，以此来处理输入格式问题。该函数的输入为文件名字符串，输出为训练样本矩阵和类标签向量。
+在将上述特征数据输入到分类器之前，必须将待处理数据的格式改变为分类器可以接受的格式。在\href{https://github.com/JPL-JUNO/Machine-Learning-in-Action/blob/main/Codes/kNN.py}{kNN.py}中创建名为file2matrix的函数，以此来处理输入格式问题。该函数的输入为文件名字符串，输出为训练样本矩阵和类标签向量。
 
-修改一下\href{}{kNN.py}文件，向其添加file2matrix()函数。
+修改一下\href{https://github.com/JPL-JUNO/Machine-Learning-in-Action/blob/main/Codes/kNN.py}{kNN.py}文件，向其添加file2matrix()函数。
 
 首先我们需要知道文本文件包含多少行。打开文件，得到文件的行数。然后创建以零填充的矩阵NumPy。将该矩阵的另一维度设置为固定值3，你可以按照自己的实际需求增加相应的代码以适应变化的输入值。循环处理文件中的每行数据，首先使用函数line.strip()截取掉所有的回车字符，然后使用tab字符\verb|\t|将上一步得到的整行数据分割成一个元素列表。接着，选取前3个元素，将它们存储到特征矩阵中。需要注意的是，我们必须明确地通知解释器，告诉它列表中存储的元素值为整型，否则Python语言会将这些元素当作字符串处理。
 
@@ -95,6 +95,43 @@ $$\sqrt{(0-67)^2 + (20000-32000)^2+(1.1-0.1)^2}$$
 
 $$newValue = \frac{oldValue-min}{max-min}$$
 
-其中min和max分别是数据集中的最小特征值和最大特征值。虽然\important{改变数值取值范围增加了分类器的复杂度}，但为了得到准确结果，我们必须这样做。我们需要在文件kNN.py中增加一个新函数autoNorm()，该函数可以自动将数字特征值转化为0到1的区间。
+其中min和max分别是数据集中的最小特征值和最大特征值。虽然\important{改变数值取值范围增加了分类器的复杂度}，但为了得到准确结果，我们必须这样做。我们需要在文件\href{https://github.com/JPL-JUNO/Machine-Learning-in-Action/blob/main/Codes/kNN.py}{kNN.py}中增加一个新函数autoNorm()，该函数可以自动将数字特征值转化为0到1的区间。
 
 在函数autoNorm()中，我们将每列的最小值放在变量minVals中，将最大值放在变量maxVals中，其中dataSet.min(0)中的参数0使得函数可以从列中选取最小值，而不是选取当前行的最小值。然后，函数计算可能的取值范围，并创建新的返回矩阵。为了归一化特征值，我们必须使用当前值减去最小值，然后除以取值范围。需要注意的是，特征值矩阵有$1000\times3$个值，而minVals和range的值都为$1\times3$。为了解决这个问题，我们使用NumPy库中tile()函数将变量内容复制成输入矩阵同样大小的矩阵，注意这是具体特征值相除
+
+\subsection{测试算法：作为完整程序验证分类器}
+机器学习算法一个很重要的工作就是评估算法的正确率，通常我们只提供已有数据的90\%作为训练样本来训练分类器，而使用其余的10\%数据去测试分类器，检测分类器的正确率。需要注意的是，10\%的测试数据应该是随机选择的，由于海伦提供的数据并没有按照特定目的来排序，所以我们可以随意选择10\%数据而不影响其随机性。
+
+对于分类器来说，错误率就是分类器给出错误结果的次数除以测试数据的总数。
+
+函数datingClassTest首先使用了file2matrix和autoNorm()函数从文件中读取数据并将其转换为归一化特征值。接着计算测试向量的数量，此步决定了normMat向量中哪些数据用于测试，哪些数据用于分类器的训练样本；然后将这两部分数据输入到原始kNN分类器函数classify0。最后，函数计算错误率并输出结果。
+
+运行\verb|kNN.datingClassTest()|，得到分类器处理约会数据集的错误率是2.4\%，这是一个相当不错的结果。我们可以改变函数datingClassTest内变量hoRatio和变量k的值，检测错误率是否随着变量值的变化而增加。依赖于分类算法、数据集和程序设置，分类器的输出结果可能有很大的不同。
+\subsection{使用算法：构建完整可用系统}
+现在终于可以使用这个分类器为海伦来对人们分类。我们会给海伦一小段程序，通过该程序海伦会在约会网站上找到某个人并输入他的信息。程序会给出她对对方喜欢程度的预测值。
+
+在kNN.py中添加classifyPerson()函数。
+
+目前为止，我们已经看到如何在数据上构建分类器。这里所有的数据让人看起来都很容易，但是如何在人不太容易看懂的数据上使用分类器呢？下一个例子将在在二进制存储的图像数据上使用kNN。
+
+\section{示例：手写识别系统}
+本节我们一步步地构造使用k-近邻分类器的手写识别系统。为了简单起见，这里构造的系统只能识别数字0到9。需要识别的数字已经使用图形处理软件，处理成具有相同的色彩和大小\footnote{The dataset is a modified version of the “Optical Recognition of Handwritten Digits Data Set” by E. Alpaydin, C. Kaynak, Department of Computer Engineering at Bogazici University, 80815 Istanbul Turkey, retrieved from the UCI Machine Learning Repository (\url{http://archive.ics.uci.edu/ml}) on October 3, 2010.}：宽高是32像素$\times$32像素的黑白图像。尽管采用文本格式存储图像不能有效地利用内存空间，但是为了方便理解，我们还是将图像转换为文本格式。
+
+\subsection{准备数据：将图像转换为测试向量}
+实际图像存储在两个目录内：目录trainingDigits中包含了大约2000个例子，每个例子的内容如图2-6所示，每个数字大约有200个样本；目录testDigits中包含了大约900个测试数据。我们使用目录trainingDigits中的数据训练分类器，使用目录testDigits中的数据测试分类器的效果。两组数据没有重叠，你可以检查一下这些文件夹的文件是否符合要求。
+
+为了使用前面两个例子的分类器，我们必须将图像格式化处理为一个向量。我们将把一个$32\times32$的二进制图像矩阵转换为$1\times1024$的向量，这样前两节使用的分类器就可以处理数字图像信息了。
+
+首先编写一段函数img2vector，将图像转换为向量：该函数创建$1\times1024$的NumPy数组，然后打开给定的文件，循环读出文件的前32行，并将每行的头32个字符值存储在NumPy数组中，最后返回数组。
+
+\subsection{测试算法：使用 k-近邻算法识别手写数字}
+
+handwritingClassTest()是测试分类器的代码，将其写入\href{https://github.com/JPL-JUNO/Machine-Learning-in-Action/blob/main/Codes/kNN.py}{kNN.py}文件中。在写入这些代码之前，我们必须确保将\verb|from os import listdir|写入文件的起始部分，这段代码的主要功能是从os模块中导入函数listdir，它可以列出给定目录的文件名。
+
+handwritingClassTest()将trainingDigits目录中的文件内容存储在列表中，然后可以得到目录中有多少文件，并将其存储在变量m中。接着，代码创建一个m行1024列的训练矩阵，该矩阵的每行数据存储一个图像。我们可以从文件名中解析出分类数字。该目录下的文件按照规则命名，如文件9\_45.txt的分类是9，它是数字9的第45个实例。然后我们可以将类代码存储在hwLabels向量中，使用前面讨论的img2vector函数载入图像。在下一步中，我们对testDigits目录中的文件执行相似的操作，不同之处是我们并不将这个目录下的文件载入矩阵中，而是使用classify0()函数测试该目录下的每个文件。
+
+k-近邻算法识别手写数字数据集，错误率为1\%。改变变量k的值、修改函数handwritingClassTest随机选取训练样本、改变训练样本的数目，都会对k-近邻算法的错误率产生影响，感兴趣的话可以改变这些变量值，观察错误率的变化。实际使用这个算法时，算法的执行效率并不高。因为算法需要为每个测试向量做2000次距离计算，每个距离计算包括了1024个维度浮点运算，总计要执行900次。是否存在一种算法减少存储空间和计算时间的开销呢？k决策树就是k-近邻算法的优化版，可以节省大量的计算开销。
+
+k-近邻算法是分类数据最简单最有效的算法，是基于实例的学习，使用算法时我们必须有接近实际数据的训练样本数据。k-近邻算法必须保存全部数据集，如果训练数据集的很大，必须使用大量的存储空间。此外，由于必须对数据集中的每个数据计算距离值，实际使用时可能非常耗时。
+
+k-近邻算法的另一个缺陷是它无法给出任何数据的基础结构信息，因此我们也无法知晓平均实例样本和典型实例样本具有什么特征。

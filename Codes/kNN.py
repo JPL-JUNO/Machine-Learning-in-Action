@@ -1,5 +1,6 @@
 import numpy as np
 import operator
+from os import listdir
 
 
 def createDataSet():
@@ -75,3 +76,57 @@ def datingClassTest():
             errorCount += 1
     print('the total error rate is {:.2f}'.format(errorCount / numTestVectors))
     print(errorCount)
+
+
+def classifyPerson():
+    resultList = ['not at all', 'in small doses', 'in large doses']
+    percentTats = float(input('percentage of time spent playing video games?'))
+    ffMiles = float(input('frequent flier miles earned per year?'))
+    iceCream = float(input('liters of ice cream consumed per year?'))
+    datingDataMat, datingLabels = file2matrix('Data/datingTestSet.txt')
+    normMat, ranges, minVals = autoNorm(datingDataMat)
+    inArr = np.array([ffMiles, percentTats, iceCream])
+    classifierResult = classify0(
+        (inArr-minVals)/ranges, normMat, datingLabels, 3)
+    print('You will probably like this person: {}'.format(
+        resultList[classifierResult - 1]))
+
+
+def img2vector(filename):
+    returnMat = np.zeros((1, 1024))
+    fr = open(filename)
+    for i in range(32):
+        lineStr = fr.readline()
+        for j in range(32):
+            returnMat[0, 32*i+j] = int(lineStr[j])
+    return returnMat
+
+
+def handwritingClassTest():
+    hwLabels = []
+    trainingFileList = listdir('Data/trainingDigits')
+    m = len(trainingFileList)
+    trainingMat = np.zeros((m, 1024))
+    for i in range(m):
+        fileNameStr = trainingFileList[i]
+        fileStr = fileNameStr.split('.')[0]  # take off .txt
+        classNumStr = int(fileStr.split('_')[0])
+        hwLabels.append(classNumStr)
+        trainingMat[i, :] = img2vector(
+            'Data/trainingDigits/{}'.format(fileNameStr))
+    testFileList = listdir('Data/testDigits')
+    errorCount = 0
+    mTest = len(testFileList)
+    for i in range(mTest):
+        fileNameStr = testFileList[i]
+        fileStr = fileNameStr.split('.')[0]
+        classNumStr = int(fileStr.split('_')[0])
+        vectorUnderTest = img2vector('Data/testDigits/{}'.format(fileNameStr))
+        classifierResult = classify0(vectorUnderTest, trainingMat, hwLabels, 3)
+        print('The classifier came back with: {}, the real answer is : {}'.format(
+            classifierResult, classNumStr))
+        if (classifierResult != classNumStr):
+            errorCount += 1
+    print('\nThe total number of errors is: {}'.format(errorCount))
+    print('\nThe total error rate is {:.2f}'.format(
+        errorCount/float(mTest)))

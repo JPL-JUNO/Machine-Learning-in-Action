@@ -13,3 +13,5 @@ Notes/temp.tex
 .aux
 Notes/ch02.aux
 __pycache__
+Codes/Data/testDigits
+Codes/Data/trainingDigits
