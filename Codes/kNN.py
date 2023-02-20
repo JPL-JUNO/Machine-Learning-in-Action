@@ -57,3 +57,21 @@ def autoNorm(dataSet):
     normDataSet = dataSet - np.tile(minVals, (m, 1))
     normDataSet = normDataSet / np.tile(ranges, (m, 1))
     return normDataSet, ranges, minVals
+
+
+def datingClassTest():
+    hoRatio = .1
+    datingDataMat, datingLabels = file2matrix('Data/datingTestSet.txt')
+    normMat, ranges, minVals = autoNorm(datingDataMat)
+    m = normMat.shape[0]
+    numTestVectors = int(m*hoRatio)
+    errorCount = 0
+    for i in range(numTestVectors):
+        classifierRet = classify0(
+            normMat[i, :], normMat[numTestVectors:m, :], datingLabels[numTestVectors:m], 3)
+        print('the classifier came back with {}, the real answer is {}'.format(
+            classifierRet, datingLabels[i]))
+        if (classifierRet != datingLabels[i]):
+            errorCount += 1
+    print('the total error rate is {:.2f}'.format(errorCount / numTestVectors))
+    print(errorCount)
