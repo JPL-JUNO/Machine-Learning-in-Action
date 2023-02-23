@@ -4,11 +4,15 @@
         "argsort",
         "arrowprops",
         "arrowstyle",
+        "axprops",
         "boxstyle",
+        "cntr",
         "didnt",
         "facecolor",
         "frameon",
         "textcoords",
-        "xycoords"
+        "xticks",
+        "xycoords",
+        "yticks"
     ]
 }
