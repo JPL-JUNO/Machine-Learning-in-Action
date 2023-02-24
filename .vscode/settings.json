@@ -10,9 +10,13 @@
         "didnt",
         "facecolor",
         "frameon",
+        "matplotlib",
+        "pyplot",
         "textcoords",
+        "xcord",
         "xticks",
         "xycoords",
+        "ycord",
         "yticks"
     ]
 }
