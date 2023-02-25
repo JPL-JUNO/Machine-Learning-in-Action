@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "Apriori",
+        "arange",
         "argsort",
         "arrowprops",
         "arrowstyle",
@@ -16,9 +17,11 @@
         "textcoords",
         "Vect",
         "xcord",
+        "xlabel",
         "xticks",
         "xycoords",
         "ycord",
+        "ylabel",
         "yticks"
     ]
 }
