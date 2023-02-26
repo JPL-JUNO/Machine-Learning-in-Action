@@ -64,3 +64,72 @@ Sigmoid函数的输入记为$z$，由下面公式得出：
 \end{algorithm}
 
 \subsection{分析数据：画出决策边界}
+设置了sigmoid函数为0。0是两个分类（类别1和类别0）的分界处。因此，我们设定 $0 = w_0x_0 + w_1x_1 +w_2x_2$，然后解出X2和X1的关系式（即分隔线的方程，注意$x_0=1$）。
+
+\figures{The logistic regression best-fit line after 500 cycles of gradient ascent}
+
+\subsection{训练算法：随机梯度上升}
+梯度上升算法在每次更新回归系数时都需要遍历整个数据集，该方法在处理100个左右的数据集时尚可，但如果有数十亿样本和成千上万的特征，那么该方法的计算复杂度就太高了。一种改进方法是一次仅用一个样本点来更新回归系数，该方法称为随机梯度上升算法。由于可以在新样本到来时对分类器进行增量式更新，因而随机梯度上升算法是一个在线学习算法。与“在线学习”相对应，一次处理所有数据被称作是“批处理”。
+
+随机梯度上升算法可以写成如下的伪代码：
+
+\begin{algorithm}
+    \caption{随机梯度上升}
+    所有回归系数初始化为1\;
+    \For{数据集中每个样本}{
+        计算该样本的梯度
+        使用alpha $\times$ gradient更新回归系数值
+    }
+    \Return 返回回归系数值
+\end{algorithm}
+
+随机梯度上升算法与梯度上升算法在代码上很相似，但也有一些区别：第一，后者的变量h和误差error都是向量，而前者则全是数值；第二，前者没有矩阵的转换过程，所有变量的数据类型都是NumPy数组。
+
+\figures{Our simple dataset with solution from stochastic gradient ascent}
+
+直接比较\autoref{Our simple dataset with solution from stochastic gradient ascent}和\autoref{The logistic regression best-fit line after 500 cycles of gradient ascent}的代码结果是不公平的，后者的结果是在整个数据集上迭代了500次才得到的。一个判断优化算法优劣的可靠方法是看它是否收敛，也就是说参数是否达到了稳定值，是否还会不断地变化？
+
+\figures{Weights versus iteration number for one pass through the dataset}
+
+\autoref{Weights versus iteration number for one pass through the dataset}展示了随机梯度上升算法在200次迭代过程中回归系数的变化情况。在200次迭代后没有出现收敛的信息，产生这种现象的原因是存在一些不能正确分类的样本点（数据集并非线性可分），在每次迭代时会引发系数的剧烈改变。我们期望算法能避免来回波动，从而收敛到某个值。另外，收敛速度也需要加快。对于\autoref{Weights versus iteration number for one pass through the dataset}存在的问题，可以通过改进的随机梯度上升算法来解决。
+
+一方面，alpha在每次迭代的时候都会调整，这会缓解图5-6上的数据波动或者高频波动。另外，虽然alpha会随着迭代次数不断减小，但永远不会减小到0，这是因为中还存在一个常数项。必须这样做的原因是为了保证在多次迭代之后新数据仍然具有一定的影响。如果要处理的问题是动态变化的，那么可以适当加大上述常数项，来确保新的值获得更大的回归系数。另一点值得注意的是，在降低alpha的函数中，alpha每次减少$1/(j+i)$ ，其中$j$是迭代次数，$i$是样本点的下标。这样当$j<<max(i)$时，alpha就不是严格下降的。避免参数的严格下降也常见于模拟退火算法等其他优化算法中。
+
+第二个改进的地方在处，这里通过随机选取样本来更新回归系数。这种方法将减少周期性的波动（如\autoref{Weights versus iteration number for one pass through the dataset}中的波动）。
+
+改进算法还增加了一个迭代次数作为第3个参数。如果该参数没有给定的话，算法将默认迭代150次。如果给定，那么算法将按照新的参数值进行迭代。
+\figures{Coefficient convergence in with random vector selection and decreasing alpha}
+
+比较\autoref{Coefficient convergence in with random vector selection and decreasing alpha}和\autoref{Weights versus iteration number for one pass through the dataset}可以看到两点不同。第一点是，图\autoref{Coefficient convergence in with random vector selection and decreasing alpha}中的系数没有像\autoref{Weights versus iteration number for one pass through the dataset}里那样出现周期性的波动，这归功于stocGradAscent1()里的样本随机选择机制；第二点是，图\autoref{Coefficient convergence in with random vector selection and decreasing alpha}的水平轴比\autoref{Weights versus iteration number for one pass through the dataset}短了很多，这是由于\verb|stocGradAscent1()|可以收敛得更快。这次我们仅仅对数据集做了20次遍历，而之前的方法是200次。
+
+下面看看在同一个数据集上的分类效果。
+
+程序运行之后应该能看到类似\autoref{The coefficients with the improved stochastic gradient descent algorithm}的结果图。该分隔线达到了与\verb|GradientAscent()|差不多的效果，但是所使用的计算量更少。
+
+\figures{The coefficients with the improved stochastic gradient descent algorithm}
+
+\section{示例：从疝气病症预测病马的死亡率}
+这里的数据\footnote{Dataset retrieved from UCI Machine Learning Repository on 11/1/2010 (\url{http://archive.ics.uci.edu/ml/datasets/Horse+Colic}). Data originally created by Mary McLeish and Matt Cecile, Department of Computer Science, University of Guelph, Guelph, Ontario, Canada N1G 2W1.}包含368个样本和28个特征，包含了医院检测马疝病的一些指标，有的指标比较主观，有的指标难以测量，例如马的疼痛级别。另外需要说明的是，除了部分指标主观和难以测量外，该数据还存在一个问题，数据集中有30\%的值是缺失的。
+
+\subsection{准备数据：处理数据中的缺失值}
+数据中的缺失值是个非常棘手的问题，有很多文献都致力于解决这个问题。那么，数据缺失究竟带来了什么问题？假设有100个样本和20个特征，这些数据都是机器收集回来的。若机器上的某个传感器损坏导致一个特征无效时该怎么办？此时是否要扔掉整个数据？这种情况下，另外19个特征怎么办？它们是否还可用？答案是肯定的。因为有时候数据相当昂贵，扔掉和重新获取都是不可取的，所以必须采用一些方法来解决这个问题。
+
+下面给出了一些可选的做法：
+\begin{itemize}
+    \item 使用可用特征的均值来填补缺失值；
+    \item 使用特殊值来填补缺失值，如$-1$；
+    \item 忽略有缺失值的样本；
+    \item 使用相似样本的均值添补缺失值；
+    \item 使用另外的机器学习算法预测缺失值。
+\end{itemize}
+
+在预处理阶段
+需要做两件事：第一，所有的缺失值必须用一个实数值来替换，因为我们使用的NumPy数据类型不允许包含缺失值。这里选择实数0来替换所有缺失值，恰好能适用于Logistic回归。这样做的直觉在于，我们需要的是一个在更新时不会影响系数的值。回归系数的更新公式如下：
+
+\verb|weights = weights + alpha * error * dataMatrix[randIndex]|
+
+如果dataMatrix的某特征对应值为0，那么该特征的系数将不做更新，即：
+
+\verb|weights = weights|
+
+另外，由于$sigmoid(0)=0.5$，即它对结果的预测不具有任何倾向性，因此上述做法也不会对误差项造成任何影响。基于上述原因，将缺失值用0代替既可以保留现有数据，也不需要对优化算法进行修改。此外，该数据集中的特征取值一般不为0，因此在某种意义上说它也满足“特殊值”这个要求。

@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 def loadDataSet():
     dataMat = []
     labelMat = []
-    fr = open('Data/testSet.txt')
+    fr = open('../Data/testSet.txt')
     for line in fr:
         lineArr = line.strip().split()
         # 必须添加float，否则将读取为字符串

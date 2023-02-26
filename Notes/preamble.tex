@@ -53,7 +53,9 @@
         \label{#1}
     \end{figure}
 }
-
+\usepackage{enumitem}
+% 去掉enumerate、itemize、description中的间隙
+\setlist{noitemsep, topsep=0pt}
 
 \tcbuselibrary{minted, skins, breakable}
 \tcbset{breakable}
