@@ -21,3 +21,46 @@ Sigmoid函数的输入记为$z$，由下面公式得出：
 \begin{equation*}
     z =w_0x_0+w_1x_1+w_2x_3+\cdots+w_nx_n
 \end{equation*}
+如果采用向量的写法，上述公式可以写成$z=\bm{w}^T\bm{x}$，它表示将这两个数值向量对应元素相乘然后全部加起来即得到$z$值。其中的向量$\bm{x}$是分类器的输入数据，向量$\bm{w}$也就是我们要找到的最佳参数（系数），从而使得分类器尽可能地精确。
+
+\subsection{梯度上升法}
+梯度上升法基于的思想是：要找到某函数的最大值，最好的方法是沿着该函数的梯度方向探寻。如果梯度记为$\nabla$，则函数$f(x,y)$的梯度由下式表示：
+\begin{equation*}
+    \nabla f(x,y)=
+    \left (
+    \begin{array}{c}
+        \frac{\partial f(x, y)}{\partial x} \\
+        \frac{\partial f(x, y)}{\partial y} \\
+    \end{array}
+    \right )
+\end{equation*}
+这个梯度意味着要沿$x$的方向移动$\frac{\partial f(x, y)}{\partial x}$，沿$y$的方向移动$\frac{\partial f(x, y)}{\partial y}$。其中，函数$f(x,y)$必须要在待计算的点上有定义并且可微。
+
+\figures{Gradient descent}
+
+\autoref{Gradient descent}中的梯度上升算法沿梯度方向移动了一步。可以看到，梯度算子总是指向函数值增长最快的方向。这里所说的是移动方向，而未提到移动量的大小。该量值称为步长，记做$\alpha$。用向量来表示的话，梯度上升算法的迭代公式如下：
+\begin{equation*}
+    \bm{w}:=\bm{w}+\alpha\nabla_{\bm{w}}f(w)
+\end{equation*}
+
+\begin{tcolorbox}[title=梯度下降]
+    梯度下降算法，它与这里的梯度上升算法是一样的，只是公式中的加法需要变成减法。因此，对应的公式可以写成
+    \begin{equation*}
+        \bm{w}:=\bm{w}-\alpha\nabla_{\bm{w}}f(w)
+    \end{equation*}
+    梯度上升算法用来求函数的最大值，而梯度下降算法用来求函数的最小值。
+\end{tcolorbox}
+
+\subsection{训练算法：使用梯度上升找到最佳参数}
+梯度上升法的伪代码如下：
+\begin{algorithm}
+    \caption{梯度上升法}
+    每个回归系数初始化为1\;
+    \Repeat{R次}{
+        计算整个数据集的梯度\;
+        使用alpha $\times$ gradient更新回归系数的向量\;
+    }
+    \Return {回归系数}
+\end{algorithm}
+
+\subsection{分析数据：画出决策边界}
