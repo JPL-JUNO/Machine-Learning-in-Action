@@ -88,3 +88,48 @@ def stocGradAscent1(dataMatrix, classLabels, numIter=150):
             weights = weights + alpha * error * dataMatrix[randIndex]
             del dataIndex[randIndex]
     return weights
+
+
+def classifyVector(inX, weights):
+    prob = sigmoid(sum(inX*weights))
+    if prob > .5:
+        return 1
+    else:
+        return 0
+
+
+def colicTest():
+    frTrain = open('Data/horseColicTraining.txt')
+    frTest = open('Data/horseColicTest.txt')
+    trainingSet = []
+    trainingLabels = []
+    for line in frTrain.readlines():
+        currentLine = line.strip().split('\t')
+        lineArr = []
+        for i in range(21):
+            lineArr.append(float(currentLine[i]))
+        trainingSet.append(lineArr)
+        trainingLabels.append(float(currentLine[21]))
+    trainWeights = stocGradAscent1(np.array(trainingSet), trainingLabels, 1000)
+    errorCount = 0
+    numTestVec = 0
+    for line in frTest.readlines():
+        numTestVec += 1
+        currentLine = line.strip().split('\t')
+        lineArr = []
+        for i in range(21):
+            lineArr.append(float(currentLine[i]))
+        if int(classifyVector(np.array(lineArr), trainWeights)) != int(currentLine[21]):
+            errorCount += 1
+    errorRate = (float(errorCount)/numTestVec)
+    print('The error rate of this test is : {}'.format(errorRate))
+    return errorRate
+
+
+def multiTest():
+    numTest = 10
+    errorSum = 0
+    for k in range(numTest):
+        errorSum += colicTest()
+    print('After {} iterations the average error rate is : {}'.format(
+        numTest, errorSum/numTest))
